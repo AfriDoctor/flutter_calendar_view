@@ -1,3 +1,5 @@
+## 1.0.4
+
 # [1.0.5] (UnReleased)
 
 - Fixed issue related to auto scroll to initial duration for day
