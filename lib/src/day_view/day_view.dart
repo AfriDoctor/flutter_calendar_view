@@ -213,6 +213,9 @@ class DayView<T extends Object?> extends StatefulWidget {
   /// Emulate vertical line offset from hour line starts.
   final double emulateVerticalOffsetBy;
 
+  // Location of the date to display
+  final String? locationName;
+
   /// Main widget for day view.
   const DayView({
     Key? key,
@@ -258,6 +261,7 @@ class DayView<T extends Object?> extends StatefulWidget {
     this.startDuration = const Duration(hours: 0),
     this.onHeaderTitleTap,
     this.emulateVerticalOffsetBy = 0,
+    this.locationName,
   })  : assert(!(onHeaderTitleTap != null && dayTitleBuilder != null),
             "can't use [onHeaderTitleTap] & [dayTitleBuilder] simultaneously"),
         assert(timeLineOffset >= 0,
@@ -466,6 +470,7 @@ class DayViewState<T extends Object?> extends State<DayView<T>> {
                                 _quarterHourIndicatorSettings,
                             emulateVerticalOffsetBy:
                                 widget.emulateVerticalOffsetBy,
+                            locationName: widget.locationName,
                           ),
                         );
                       },

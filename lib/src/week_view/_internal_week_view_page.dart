@@ -132,6 +132,9 @@ class InternalWeekViewPage<T extends Object?> extends StatelessWidget {
   /// Emulate vertical line offset from hour line starts.
   final double emulateVerticalOffsetBy;
 
+  // Location of the date to display
+  final String? locationName;
+
   /// A single page for week view.
   const InternalWeekViewPage(
       {Key? key,
@@ -170,8 +173,9 @@ class InternalWeekViewPage<T extends Object?> extends StatelessWidget {
       required this.showWeekDayAtBottom,
       required this.showHalfHours,
       required this.showQuarterHours,
-      required this.emulateVerticalOffsetBy})
-      : super(key: key);
+      required this.emulateVerticalOffsetBy,
+      this.locationName,
+    }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -358,6 +362,7 @@ class InternalWeekViewPage<T extends Object?> extends StatelessWidget {
                       timeLineBuilder: timeLineBuilder,
                       showHalfHours: showHalfHours,
                       showQuarterHours: showQuarterHours,
+                      locationName: locationName,
                     ),
                   ],
                 ),

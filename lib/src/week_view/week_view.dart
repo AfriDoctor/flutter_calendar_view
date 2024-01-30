@@ -213,6 +213,9 @@ class WeekView<T extends Object?> extends StatefulWidget {
   /// If true this will show week day at bottom position.
   final bool showWeekDayAtBottom;
 
+  // Location of the date to display
+  final String? locationName;
+
   /// Main widget for week view.
   const WeekView({
     Key? key,
@@ -255,6 +258,7 @@ class WeekView<T extends Object?> extends StatefulWidget {
     this.timeLineStringBuilder,
     this.weekDayStringBuilder,
     this.weekDayDateStringBuilder,
+    this.locationName,
     this.headerStyle = const HeaderStyle(),
     this.safeAreaOption = const SafeAreaOption(),
     this.fullDayEventBuilder,
@@ -491,6 +495,7 @@ class WeekViewState<T extends Object?> extends State<WeekView<T>> {
                             emulateVerticalOffsetBy:
                                 widget.emulateVerticalOffsetBy,
                             showWeekDayAtBottom: widget.showWeekDayAtBottom,
+                            locationName: widget.locationName
                           ),
                         );
                       },

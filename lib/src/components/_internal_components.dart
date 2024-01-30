@@ -15,6 +15,8 @@ import '../modals.dart';
 import '../painters.dart';
 import '../typedefs.dart';
 import 'event_scroll_notifier.dart';
+import 'package:timezone/timezone.dart';
+import 'package:timezone/standalone.dart' as tz;
 
 /// Widget to display tile line according to current time.
 class LiveTimeIndicator extends StatefulWidget {
@@ -116,6 +118,9 @@ class TimeLine extends StatelessWidget {
   /// Flag to display quarter hours.
   final bool showQuarterHours;
 
+  // Location of the date to display
+  final String? locationName;
+
   static DateTime get _date => DateTime.now();
 
   double get _halfHourHeight => hourHeight / 2;
@@ -130,6 +135,7 @@ class TimeLine extends StatelessWidget {
     required this.timeLineBuilder,
     this.showHalfHours = false,
     this.showQuarterHours = false,
+    this.locationName,
   }) : super(key: key);
 
   @override
@@ -192,6 +198,19 @@ class TimeLine extends StatelessWidget {
     required int hour,
     int minutes = 0,
   }) {
+    DateTime current = DateTime(
+      _date.year,
+      _date.month,
+      _date.day,
+      hour,
+      minutes,
+    );
+
+    if (locationName != null) {
+      final Location location = tz.getLocation(locationName!);
+      current = TZDateTime.from(current, location);
+    }
+
     return Positioned(
       top: topPosition,
       left: 0,
@@ -200,15 +219,7 @@ class TimeLine extends StatelessWidget {
       child: Container(
         height: hourHeight,
         width: timeLineWidth,
-        child: timeLineBuilder.call(
-          DateTime(
-            _date.year,
-            _date.month,
-            _date.day,
-            hour,
-            minutes,
-          ),
-        ),
+        child: timeLineBuilder.call(current),
       ),
     );
   }
