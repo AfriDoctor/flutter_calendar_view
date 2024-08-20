@@ -216,6 +216,12 @@ class DayView<T extends Object?> extends StatefulWidget {
   // Location of the date to display
   final String? locationName;
 
+  // Start time to display
+  final TimeOfDay? startTime;
+
+  // End time to display
+  final TimeOfDay? endTime;
+
   /// Main widget for day view.
   const DayView({
     Key? key,
@@ -262,6 +268,8 @@ class DayView<T extends Object?> extends StatefulWidget {
     this.onHeaderTitleTap,
     this.emulateVerticalOffsetBy = 0,
     this.locationName,
+    this.startTime,
+    this.endTime,
   })  : assert(!(onHeaderTitleTap != null && dayTitleBuilder != null),
             "can't use [onHeaderTitleTap] & [dayTitleBuilder] simultaneously"),
         assert(timeLineOffset >= 0,
@@ -471,6 +479,8 @@ class DayViewState<T extends Object?> extends State<DayView<T>> {
                             emulateVerticalOffsetBy:
                                 widget.emulateVerticalOffsetBy,
                             locationName: widget.locationName,
+                            startTime: widget.startTime,
+                            endTime: widget.endTime,
                           ),
                         );
                       },
@@ -550,9 +560,29 @@ class DayViewState<T extends Object?> extends State<DayView<T>> {
         "quarterHourIndicator height must be less than minuteHeight * 60");
   }
 
+  double _calculateDuration(TimeOfDay value) =>
+      value.hour + value.minute / TimeOfDay.minutesPerHour;
+
+  double _getHoursADay() {
+    double hoursADay = 0;
+    if (widget.startTime != null && widget.endTime != null) {
+      hoursADay = _calculateDuration(widget.endTime!) -
+          _calculateDuration(widget.startTime!);
+    } else if (widget.startTime != null && widget.endTime == null) {
+      hoursADay = Constants.hoursADay.toDouble() -
+          _calculateDuration(widget.startTime!);
+    } else if (widget.startTime == null && widget.endTime != null) {
+      hoursADay = _calculateDuration(widget.endTime!);
+    } else {
+      hoursADay = Constants.hoursADay.toDouble();
+    }
+    return hoursADay;
+  }
+
   void _calculateHeights() {
     _hourHeight = widget.heightPerMinute * 60;
-    _height = _hourHeight * Constants.hoursADay;
+    double hoursADay = _getHoursADay();
+    _height = _hourHeight * hoursADay + 10;
   }
 
   void _assignBuilders() {
@@ -608,8 +638,11 @@ class DayViewState<T extends Object?> extends State<DayView<T>> {
     required double heightPerMinute,
     required MinuteSlotSize minuteSlotSize,
   }) {
+    int hoursADay = _getHoursADay().toInt();
+    int startHour = widget.startTime != null ? widget.startTime!.hour : 0;
+
     final heightPerSlot = minuteSlotSize.minutes * heightPerMinute;
-    final slots = (Constants.hoursADay * 60) ~/ minuteSlotSize.minutes;
+    final slots = (hoursADay * 60) ~/ minuteSlotSize.minutes;
 
     return Container(
       height: height,
@@ -629,7 +662,7 @@ class DayViewState<T extends Object?> extends State<DayView<T>> {
                     date.year,
                     date.month,
                     date.day,
-                    0,
+                    startHour,
                     minuteSlotSize.minutes * i,
                   ),
                 ),
@@ -638,7 +671,7 @@ class DayViewState<T extends Object?> extends State<DayView<T>> {
                     date.year,
                     date.month,
                     date.day,
-                    0,
+                    startHour,
                     minuteSlotSize.minutes * i,
                   ),
                 ),

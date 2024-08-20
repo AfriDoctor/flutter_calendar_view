@@ -125,6 +125,12 @@ class TimeLine extends StatelessWidget {
 
   double get _halfHourHeight => hourHeight / 2;
 
+  // Start time to display
+  final TimeOfDay? startTime;
+
+  // End time to display
+  final TimeOfDay? endTime;
+
   /// Time line to display time at left side of day or week view.
   const TimeLine({
     Key? key,
@@ -136,10 +142,15 @@ class TimeLine extends StatelessWidget {
     this.showHalfHours = false,
     this.showQuarterHours = false,
     this.locationName,
+    this.startTime,
+    this.endTime,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    int? initialHour = startTime != null ? startTime!.hour : 1;
+    int? hoursADay = endTime != null ? endTime!.hour : Constants.hoursADay;
+    int totalHours = hoursADay - initialHour;
     return ConstrainedBox(
       key: ValueKey(hourHeight),
       constraints: BoxConstraints(
@@ -150,30 +161,30 @@ class TimeLine extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          for (int i = 1; i < Constants.hoursADay; i++)
+          for (int i = 1; i <= totalHours; i++)
             _timelinePositioned(
               topPosition: hourHeight * i - timeLineOffset,
               bottomPosition: height - (hourHeight * (i + 1)) + timeLineOffset,
-              hour: i,
+              hour: initialHour + i,
             ),
           if (showHalfHours)
-            for (int i = 0; i < Constants.hoursADay; i++)
+            for (int i = 0; i < totalHours; i++)
               _timelinePositioned(
                 topPosition: hourHeight * i - timeLineOffset + _halfHourHeight,
                 bottomPosition:
                     height - (hourHeight * (i + 1)) + timeLineOffset,
-                hour: i,
+                hour: initialHour + i,
                 minutes: 30,
               ),
           if (showQuarterHours)
-            for (int i = 0; i < Constants.hoursADay; i++) ...[
+            for (int i = 0; i < totalHours; i++) ...[
               /// this is for 15 minutes
               _timelinePositioned(
                 topPosition:
                     hourHeight * i - timeLineOffset + hourHeight * 0.25,
                 bottomPosition:
                     height - (hourHeight * (i + 1)) + timeLineOffset,
-                hour: i,
+                hour: initialHour + i,
                 minutes: 15,
               ),
 
@@ -183,7 +194,7 @@ class TimeLine extends StatelessWidget {
                     hourHeight * i - timeLineOffset + hourHeight * 0.75,
                 bottomPosition:
                     height - (hourHeight * (i + 1)) + timeLineOffset,
-                hour: i,
+                hour: initialHour + i,
                 minutes: 45,
               ),
             ],

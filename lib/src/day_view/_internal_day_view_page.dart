@@ -115,41 +115,49 @@ class InternalDayViewPage<T extends Object?> extends StatelessWidget {
   // Location of the date to display
   final String? locationName;
 
+  // Start time to display
+  final TimeOfDay? startTime;
+
+  // End time to display
+  final TimeOfDay? endTime;
+
   /// Defines a single day page.
-  const InternalDayViewPage(
-      {Key? key,
-      required this.showVerticalLine,
-      required this.width,
-      required this.date,
-      required this.eventTileBuilder,
-      required this.controller,
-      required this.timeLineBuilder,
-      required this.hourIndicatorSettings,
-      required this.hourLinePainter,
-      required this.showLiveLine,
-      required this.liveTimeIndicatorSettings,
-      required this.heightPerMinute,
-      required this.timeLineWidth,
-      required this.timeLineOffset,
-      required this.height,
-      required this.hourHeight,
-      required this.eventArranger,
-      required this.verticalLineOffset,
-      required this.onTileTap,
-      required this.onDateLongPress,
-      required this.onDateTap,
-      required this.minuteSlotSize,
-      required this.scrollNotifier,
-      required this.fullDayEventBuilder,
-      required this.scrollController,
-      required this.dayDetectorBuilder,
-      required this.showHalfHours,
-      required this.showQuarterHours,
-      required this.halfHourIndicatorSettings,
-      required this.quarterHourIndicatorSettings,
-      required this.emulateVerticalOffsetBy,
-      this.locationName})
-      : super(key: key);
+  const InternalDayViewPage({
+    Key? key,
+    required this.showVerticalLine,
+    required this.width,
+    required this.date,
+    required this.eventTileBuilder,
+    required this.controller,
+    required this.timeLineBuilder,
+    required this.hourIndicatorSettings,
+    required this.hourLinePainter,
+    required this.showLiveLine,
+    required this.liveTimeIndicatorSettings,
+    required this.heightPerMinute,
+    required this.timeLineWidth,
+    required this.timeLineOffset,
+    required this.height,
+    required this.hourHeight,
+    required this.eventArranger,
+    required this.verticalLineOffset,
+    required this.onTileTap,
+    required this.onDateLongPress,
+    required this.onDateTap,
+    required this.minuteSlotSize,
+    required this.scrollNotifier,
+    required this.fullDayEventBuilder,
+    required this.scrollController,
+    required this.dayDetectorBuilder,
+    required this.showHalfHours,
+    required this.showQuarterHours,
+    required this.halfHourIndicatorSettings,
+    required this.quarterHourIndicatorSettings,
+    required this.emulateVerticalOffsetBy,
+    this.locationName,
+    this.startTime,
+    this.endTime,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -252,6 +260,8 @@ class InternalDayViewPage<T extends Object?> extends StatelessWidget {
                       showQuarterHours: showQuarterHours,
                       key: ValueKey(heightPerMinute),
                       locationName: locationName,
+                      startTime: startTime,
+                      endTime: endTime,
                     ),
                     if (showLiveLine && liveTimeIndicatorSettings.height > 0)
                       IgnorePointer(

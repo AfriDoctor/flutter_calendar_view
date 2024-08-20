@@ -216,6 +216,12 @@ class WeekView<T extends Object?> extends StatefulWidget {
   // Location of the date to display
   final String? locationName;
 
+  // Start time to display
+  final TimeOfDay? startTime;
+
+  // End time to display
+  final TimeOfDay? endTime;
+
   /// Main widget for week view.
   const WeekView({
     Key? key,
@@ -267,6 +273,8 @@ class WeekView<T extends Object?> extends StatefulWidget {
     this.showQuarterHours = false,
     this.emulateVerticalOffsetBy = 0,
     this.showWeekDayAtBottom = false,
+    this.startTime,
+    this.endTime,
   })  : assert(!(onHeaderTitleTap != null && weekPageHeaderBuilder != null),
             "can't use [onHeaderTitleTap] & [weekPageHeaderBuilder] simultaneously"),
         assert((timeLineOffset) >= 0,
@@ -495,7 +503,9 @@ class WeekViewState<T extends Object?> extends State<WeekView<T>> {
                             emulateVerticalOffsetBy:
                                 widget.emulateVerticalOffsetBy,
                             showWeekDayAtBottom: widget.showWeekDayAtBottom,
-                            locationName: widget.locationName
+                            locationName: widget.locationName,
+                            startTime: widget.startTime,
+                            endTime: widget.endTime,
                           ),
                         );
                       },
@@ -593,9 +603,29 @@ class WeekViewState<T extends Object?> extends State<WeekView<T>> {
         "quarterHourIndicator height must be less than minuteHeight * 60");
   }
 
+  double _calculateDuration(TimeOfDay value) =>
+      value.hour + value.minute / TimeOfDay.minutesPerHour;
+
+  double _getHoursADay() {
+    double hoursADay = 0;
+    if (widget.startTime != null && widget.endTime != null) {
+      hoursADay = _calculateDuration(widget.endTime!) -
+          _calculateDuration(widget.startTime!);
+    } else if (widget.startTime != null && widget.endTime == null) {
+      hoursADay = Constants.hoursADay.toDouble() -
+          _calculateDuration(widget.startTime!);
+    } else if (widget.startTime == null && widget.endTime != null) {
+      hoursADay = _calculateDuration(widget.endTime!);
+    } else {
+      hoursADay = Constants.hoursADay.toDouble();
+    }
+    return hoursADay;
+  }
+
   void _calculateHeights() {
     _hourHeight = widget.heightPerMinute * 60;
-    _height = _hourHeight * Constants.hoursADay;
+    double hoursADay = _getHoursADay();
+    _height = _hourHeight * hoursADay + 10;
   }
 
   void _assignBuilders() {
@@ -672,8 +702,11 @@ class WeekViewState<T extends Object?> extends State<WeekView<T>> {
     required double heightPerMinute,
     required MinuteSlotSize minuteSlotSize,
   }) {
+    int hoursADay = _getHoursADay().toInt();
+    int startHour = widget.startTime != null ? widget.startTime!.hour : 0;
+
     final heightPerSlot = minuteSlotSize.minutes * heightPerMinute;
-    final slots = (Constants.hoursADay * 60) ~/ minuteSlotSize.minutes;
+    final slots = (hoursADay * 60) ~/ minuteSlotSize.minutes;
 
     return Container(
       height: height,
@@ -693,7 +726,7 @@ class WeekViewState<T extends Object?> extends State<WeekView<T>> {
                     date.year,
                     date.month,
                     date.day,
-                    0,
+                    startHour,
                     minuteSlotSize.minutes * i,
                   ),
                 ),
@@ -702,7 +735,7 @@ class WeekViewState<T extends Object?> extends State<WeekView<T>> {
                     date.year,
                     date.month,
                     date.day,
-                    0,
+                    startHour,
                     minuteSlotSize.minutes * i,
                   ),
                 ),
