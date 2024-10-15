@@ -17,6 +17,7 @@ import '../enumerations.dart';
 import '../event_arrangers/event_arrangers.dart';
 import '../event_controller.dart';
 import '../extensions.dart';
+import '../helpers/time_zone.dart';
 import '../modals.dart';
 import '../painters.dart';
 import '../style/header_style.dart';
@@ -333,9 +334,17 @@ class DayViewState<T extends Object?> extends State<DayView<T>> {
 
   final _scrollConfiguration = EventScrollConfiguration<T>();
 
+  late TimeOfDay? startTime;
+
+  late TimeOfDay? endTime;
+
+  int timeZoneOffset = 0;
+
   @override
   void initState() {
     super.initState();
+
+    _updateTimeToCurrentTimeZone();
 
     _reloadCallback = _reload;
     _setDateRange();
@@ -349,8 +358,27 @@ class DayViewState<T extends Object?> extends State<DayView<T>> {
         initialScrollOffset: widget.scrollOffset ??
             widget.startDuration.inMinutes * widget.heightPerMinute);
     _pageController = PageController(initialPage: _currentIndex);
-    _eventArranger = widget.eventArranger ?? SideEventArranger<T>();
+    _eventArranger = widget.eventArranger ??
+        SideEventArranger<T>(startTime: widget.startTime);
     _assignBuilders();
+  }
+
+  void _updateTimeToCurrentTimeZone() {
+    final int currentTimeZoneOffset = widget.locationName != null
+        ? TimeZoneHelper.getTimeZoneOffset(widget.locationName!)
+        : 0;
+    final TimeOfDay? finalStartTime = widget.startTime != null
+        ? TimeZoneHelper.addHour(widget.startTime!, currentTimeZoneOffset)
+        : null;
+    final TimeOfDay? finalEndTime = widget.endTime != null
+        ? TimeZoneHelper.addHour(widget.endTime!, currentTimeZoneOffset)
+        : null;
+
+    setState(() {
+      timeZoneOffset = currentTimeZoneOffset;
+      startTime = finalStartTime;
+      endTime = finalEndTime;
+    });
   }
 
   @override
@@ -376,6 +404,9 @@ class DayViewState<T extends Object?> extends State<DayView<T>> {
   @override
   void didUpdateWidget(DayView<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    _updateTimeToCurrentTimeZone();
+
     // Update controller.
     final newController = widget.controller ??
         CalendarControllerProvider.of<T>(context).controller;
@@ -395,7 +426,8 @@ class DayViewState<T extends Object?> extends State<DayView<T>> {
       _pageController.jumpToPage(_currentIndex);
     }
 
-    _eventArranger = widget.eventArranger ?? SideEventArranger<T>();
+    _eventArranger = widget.eventArranger ??
+        SideEventArranger<T>(startTime: widget.startTime);
 
     // Update heights.
     _calculateHeights();
@@ -479,8 +511,8 @@ class DayViewState<T extends Object?> extends State<DayView<T>> {
                             emulateVerticalOffsetBy:
                                 widget.emulateVerticalOffsetBy,
                             locationName: widget.locationName,
-                            startTime: widget.startTime,
-                            endTime: widget.endTime,
+                            startTime: startTime,
+                            endTime: endTime,
                           ),
                         );
                       },
@@ -639,7 +671,7 @@ class DayViewState<T extends Object?> extends State<DayView<T>> {
     required MinuteSlotSize minuteSlotSize,
   }) {
     int hoursADay = _getHoursADay().toInt();
-    int startHour = widget.startTime != null ? widget.startTime!.hour : 0;
+    int startHour = startTime != null ? startTime!.hour : 0;
 
     final heightPerSlot = minuteSlotSize.minutes * heightPerMinute;
     final slots = (hoursADay * 60) ~/ minuteSlotSize.minutes;

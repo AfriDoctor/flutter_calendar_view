@@ -37,15 +37,19 @@ class LiveTimeIndicator extends StatefulWidget {
   /// Defines height occupied by one minute.
   final double heightPerMinute;
 
+  // Start time to display
+  final TimeOfDay? startTime;
+
   /// Widget to display tile line according to current time.
-  const LiveTimeIndicator(
-      {Key? key,
-      required this.width,
-      required this.height,
-      required this.timeLineWidth,
-      required this.liveTimeIndicatorSettings,
-      required this.heightPerMinute})
-      : super(key: key);
+  const LiveTimeIndicator({
+    Key? key,
+    required this.width,
+    required this.height,
+    required this.timeLineWidth,
+    required this.liveTimeIndicatorSettings,
+    required this.heightPerMinute,
+    this.startTime,
+  }) : super(key: key);
 
   @override
   _LiveTimeIndicatorState createState() => _LiveTimeIndicatorState();
@@ -81,6 +85,12 @@ class _LiveTimeIndicatorState extends State<LiveTimeIndicator> {
 
   @override
   Widget build(BuildContext context) {
+    int currentMinutes = _currentTime.getTotalMinutes;
+
+    if (widget.startTime != null) {
+      currentMinutes -= widget.startTime!.getTotalMinutes;
+    }
+
     return CustomPaint(
       size: Size(widget.width, widget.height),
       painter: CurrentTimeLinePainter(
@@ -88,7 +98,7 @@ class _LiveTimeIndicatorState extends State<LiveTimeIndicator> {
         height: widget.liveTimeIndicatorSettings.height,
         offset: Offset(
           widget.timeLineWidth + widget.liveTimeIndicatorSettings.offset,
-          _currentTime.getTotalMinutes * widget.heightPerMinute,
+          currentMinutes * widget.heightPerMinute,
         ),
       ),
     );
@@ -289,6 +299,7 @@ class EventGenerator<T extends Object?> extends StatelessWidget {
       heightPerMinute: heightPerMinute,
     );
 
+// position tile
     return List.generate(events.length, (index) {
       return Positioned(
         top: events[index].top,

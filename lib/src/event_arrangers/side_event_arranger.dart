@@ -8,6 +8,7 @@ class SideEventArranger<T extends Object?> extends EventArranger<T> {
   /// This class will provide method that will arrange
   /// all the events side by side.
   const SideEventArranger({
+    this.startTime,
     this.includeEdges = false,
   });
 
@@ -18,6 +19,9 @@ class SideEventArranger<T extends Object?> extends EventArranger<T> {
   /// If includeEdges is true, it will offset the events else it will not.
   ///
   final bool includeEdges;
+
+  // Start time to display
+  final TimeOfDay? startTime;
 
   /// {@macro event_arranger_arrange_method_doc}
   ///
@@ -30,9 +34,9 @@ class SideEventArranger<T extends Object?> extends EventArranger<T> {
     required double width,
     required double heightPerMinute,
   }) {
-    final mergedEvents = MergeEventArranger<T>(
-      includeEdges: includeEdges,
-    ).arrange(
+    final mergedEvents =
+        MergeEventArranger<T>(includeEdges: includeEdges, startTime: startTime)
+            .arrange(
       events: events,
       height: height,
       width: width,
@@ -83,6 +87,13 @@ class SideEventArranger<T extends Object?> extends EventArranger<T> {
 
       final slotWidth = width / column;
 
+      int startMinutes = 0;
+
+      if (startTime != null) {
+        // Subtract start time to calculate correct tile position
+        startMinutes = startTime!.getTotalMinutes * -1;
+      }
+
       for (final sideEvent in sideEventData) {
         if (sideEvent.event.startTime == null ||
             sideEvent.event.endTime == null) {
@@ -103,12 +114,13 @@ class SideEventArranger<T extends Object?> extends EventArranger<T> {
         final bottom = height -
             (endTime.getTotalMinutes == 0
                     ? Constants.minutesADay
-                    : endTime.getTotalMinutes) *
+                    : endTime.getTotalMinutes + startMinutes) *
                 heightPerMinute;
+        // ou ici
         arrangedEvents.add(OrganizedCalendarEventData<T>(
           left: slotWidth * (sideEvent.column - 1),
           right: slotWidth * (column - sideEvent.column),
-          top: startTime.getTotalMinutes * heightPerMinute,
+          top: (startTime.getTotalMinutes + startMinutes) * heightPerMinute,
           bottom: bottom,
           startDuration: startTime,
           endDuration: endTime,
