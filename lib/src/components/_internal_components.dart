@@ -158,7 +158,7 @@ class TimeLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int? initialHour = startTime != null ? startTime!.hour : 1;
+    int? initialHour = startTime != null ? startTime!.hour : 0;
     int? hoursADay = endTime != null ? endTime!.hour : Constants.hoursADay;
     int totalHours = hoursADay - initialHour;
     return ConstrainedBox(
