@@ -5,6 +5,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import '../calendar_event_data.dart';
 import '../constants.dart';

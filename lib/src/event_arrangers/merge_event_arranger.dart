@@ -10,6 +10,7 @@ class MergeEventArranger<T extends Object?> extends EventArranger<T> {
   /// [OrganizedCalendarEventData.events] will gives
   /// list of all the combined events.
   const MergeEventArranger({
+    this.startTime,
     this.includeEdges = true,
   });
 
@@ -20,6 +21,9 @@ class MergeEventArranger<T extends Object?> extends EventArranger<T> {
   /// If includeEdges is true, it will merge the events else it will not.
   ///
   final bool includeEdges;
+
+  // Start time to display
+  final TimeOfDay? startTime;
 
   /// {@macro event_arranger_arrange_method_doc}
   ///
@@ -36,6 +40,13 @@ class MergeEventArranger<T extends Object?> extends EventArranger<T> {
     // sorted in ascending order of the start time.
     //
     final arrangedEvents = <OrganizedCalendarEventData<T>>[];
+
+    int startMinutes = 0;
+
+    if (startTime != null) {
+      // Subtract start time to calculate correct tile position
+      startMinutes = startTime!.getTotalMinutes * -1;
+    }
 
     for (final event in events) {
       // Checks if an event has valid start and end time.
@@ -62,10 +73,10 @@ class MergeEventArranger<T extends Object?> extends EventArranger<T> {
       final startTime = event.startTime!;
       final endTime = event.endTime!;
 
-      final eventStart = startTime.getTotalMinutes;
+      final eventStart = startTime.getTotalMinutes + startMinutes;
       final eventEnd = endTime.getTotalMinutes == 0
           ? Constants.minutesADay
-          : endTime.getTotalMinutes;
+          : endTime.getTotalMinutes + startMinutes;
 
       final arrangeEventLen = arrangedEvents.length;
 
