@@ -1,6 +1,6 @@
 name: calendar_view
 description: A Flutter package allows you to easily implement all calendar UI and calendar event functionality.
-version: 1.0.5
+version: 1.0.6
 homepage: https://github.com/AfriDoctor/flutter_calendar_view
 publish_to: 'https://dart.cloudsmith.io/afridoctor/flutter_calendar_view'
 
